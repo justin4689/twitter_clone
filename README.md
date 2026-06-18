@@ -1,6 +1,8 @@
 # MERN Stack Project: Build and Deploy a Twitter Clone From Scratch | JWT, Socket.io
 
-![Demo App](https://i.ibb.co/f8y9vGS/Group-82.png)
+![Screenshort 1](/frontend/public/screenshort1.png)
+![Screenshort 2](/frontend/public/screenshort1.png)
+![Screenshort 3](/frontend/public/screenshort1.png)
 
 
 
@@ -45,3 +47,10 @@ npm run build
 ```shell
 npm start
 ```
+
+Username	Mot de passe
+alice	    password123
+bob	        password123
+clara	   password123
+david	   password123
+emma	     password123

@@ -1,4 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { Toaster } from "react-hot-toast";
 
 import HomePage from "./pages/home/HomePage";
 import LoginPage from "./pages/auth/login/LoginPage";
@@ -8,23 +10,14 @@ import ProfilePage from "./pages/profile/ProfilePage";
 
 import Sidebar from "./components/common/Sidebar";
 import RightPanel from "./components/common/RightPanel";
-
-import { Toaster } from "react-hot-toast";
-import { useQuery } from "@tanstack/react-query";
 import LoadingSpinner from "./components/common/LoadingSpinner";
 
-function App() {
-	const { data: authUser, isLoading } = useQuery({
-		queryKey: ["authUser"],
-		queryFn: async () => {
-			const res = await fetch("/api/auth/me");
-			const data = await res.json();
-			if (data.error) return null;
-			if (!res.ok) throw new Error(data.error || "Something went wrong");
-			return data;
-		},
-		retry: false,
-	});
+import { SocketProvider } from "./context/SocketContext";
+import useNotifications from "./hooks/useNotifications";
+
+// Composant interne : a accès au socket via SocketProvider parent
+function AppContent({ authUser, isLoading }) {
+	useNotifications(); // écoute "newNotification" globalement
 
 	if (isLoading) {
 		return (
@@ -47,6 +40,26 @@ function App() {
 			{authUser && <RightPanel />}
 			<Toaster />
 		</div>
+	);
+}
+
+function App() {
+	const { data: authUser, isLoading } = useQuery({
+		queryKey: ["authUser"],
+		queryFn: async () => {
+			const res = await fetch("/api/auth/me");
+			const data = await res.json();
+			if (data.error) return null;
+			if (!res.ok) throw new Error(data.error || "Something went wrong");
+			return data;
+		},
+		retry: false,
+	});
+
+	return (
+		<SocketProvider authenticated={!!authUser && !isLoading}>
+			<AppContent authUser={authUser} isLoading={isLoading} />
+		</SocketProvider>
 	);
 }
 

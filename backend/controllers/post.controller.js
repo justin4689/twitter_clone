@@ -2,6 +2,7 @@ import Notification from "../models/notification.model.js";
 import Post from "../models/post.model.js";
 import User from "../models/user.model.js";
 import { v2 as cloudinary } from "cloudinary";
+import { emitToUser } from "../socket/socket.js";
 
 export const createPost = async (req, res) => {
 	const { text } = req.body;
@@ -76,8 +77,14 @@ export const likeUnlikePost = async (req, res) => {
 		await User.updateOne({ _id: userId }, { $push: { likedPosts: postId } });
 		await post.save();
 
-		const notification = new Notification({ from: userId, to: post.user, type: "like" });
-		await notification.save();
+		// N'envoie pas de notif si on like son propre post
+		if (post.user.toString() !== userId.toString()) {
+			const notification = new Notification({ from: userId, to: post.user, type: "like" });
+			await notification.save();
+
+			const populated = await notification.populate("from", "username profileImg");
+			emitToUser(post.user, "newNotification", populated);
+		}
 
 		res.status(200).json(post.likes);
 	}

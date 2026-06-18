@@ -1,4 +1,5 @@
 import { fileURLToPath } from "url";
+import { createServer } from "http";
 import path from "path";
 import express from "express";
 import dotenv from "dotenv";
@@ -10,6 +11,7 @@ import userRoutes from "./routes/user.route.js";
 import postRoutes from "./routes/post.route.js";
 import notificationRoutes from "./routes/notification.route.js";
 import connectMongoDB from "./db/connectMongoDB.js";
+import { initSocket } from "./socket/socket.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename); // → .../backend
@@ -23,7 +25,10 @@ cloudinary.config({
 });
 
 const app = express();
+const httpServer = createServer(app);
 const PORT = process.env.PORT || 5000;
+
+initSocket(httpServer);
 
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true }));
@@ -49,7 +54,7 @@ app.use((err, req, res, next) => {
 	res.status(statusCode).json({ error: err.message || "Internal Server Error" });
 });
 
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
 	console.log(`Server is running on port ${PORT}`);
 	connectMongoDB();
 });

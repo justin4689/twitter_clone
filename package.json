@@ -4,9 +4,10 @@
 	"description": "",
 	"main": "backend/server.js",
 	"scripts": {
-		"dev": "NODE_ENV=development nodemon backend/server.js",
-		"start": "NODE_ENV=production node backend/server.js",
-		"build": "npm install && npm install --prefix frontend && npm run build --prefix frontend"
+		"dev": "cross-env NODE_ENV=development nodemon backend/server.js",
+		"start": "cross-env NODE_ENV=production node backend/server.js",
+		"build": "npm install && npm install --prefix frontend && npm run build --prefix frontend",
+		"seed": "node backend/db/seed.js"
 	},
 	"keywords": [],
 	"author": "",
@@ -20,9 +21,11 @@
 		"dotenv": "^16.6.1",
 		"express": "^5.2.1",
 		"jsonwebtoken": "^9.0.3",
-		"mongoose": "^9.7.1"
+		"mongoose": "^9.7.1",
+		"socket.io": "^4.8.3"
 	},
 	"devDependencies": {
+		"cross-env": "^10.1.0",
 		"nodemon": "^3.1.9"
 	}
 }

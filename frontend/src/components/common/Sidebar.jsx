@@ -10,6 +10,21 @@ import toast from "react-hot-toast";
 
 const Sidebar = () => {
 	const queryClient = useQueryClient();
+	const { data: authUser } = useQuery({ queryKey: ["authUser"] });
+
+	const { data: unreadData } = useQuery({
+		queryKey: ["notificationsUnreadCount"],
+		queryFn: async () => {
+			const res = await fetch("/api/notifications/unread-count");
+			const data = await res.json();
+			if (!res.ok) throw new Error(data.error);
+			return data;
+		},
+		enabled: !!authUser,
+		refetchInterval: 60_000, // fallback polling toutes les 60s
+	});
+	const unreadCount = unreadData?.count ?? 0;
+
 	const { mutate: logout } = useMutation({
 		mutationFn: async () => {
 			const res = await fetch("/api/auth/logout", { method: "POST" });
@@ -23,7 +38,6 @@ const Sidebar = () => {
 			toast.error("Logout failed");
 		},
 	});
-	const { data: authUser } = useQuery({ queryKey: ["authUser"] });
 
 	return (
 		<div className='md:flex-[2_2_0] w-18 max-w-52'>
@@ -46,7 +60,14 @@ const Sidebar = () => {
 							to='/notifications'
 							className='flex gap-3 items-center hover:bg-stone-900 transition-all rounded-full duration-300 py-2 pl-2 pr-4 max-w-fit cursor-pointer'
 						>
-							<IoNotifications className='w-6 h-6' />
+							<div className='relative'>
+								<IoNotifications className='w-6 h-6' />
+								{unreadCount > 0 && (
+									<span className='absolute -top-1 -right-1 bg-primary text-white text-[10px] font-bold rounded-full min-w-[1rem] h-4 flex items-center justify-center px-0.5 leading-none'>
+										{unreadCount > 9 ? "9+" : unreadCount}
+									</span>
+								)}
+							</div>
 							<span className='text-lg hidden md:block'>Notifications</span>
 						</Link>
 					</li>

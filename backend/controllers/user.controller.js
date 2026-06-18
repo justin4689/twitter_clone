@@ -3,6 +3,7 @@ import { v2 as cloudinary } from "cloudinary";
 
 import Notification from "../models/notification.model.js";
 import User from "../models/user.model.js";
+import { emitToUser } from "../socket/socket.js";
 
 export const getUserProfile = async (req, res) => {
 	const { username } = req.params;
@@ -34,8 +35,11 @@ export const followUnfollowUser = async (req, res) => {
 		await User.findByIdAndUpdate(id, { $push: { followers: req.user._id } });
 		await User.findByIdAndUpdate(req.user._id, { $push: { following: id } });
 
-		const newNotification = new Notification({ type: "follow", from: req.user._id, to: userToModify._id });
-		await newNotification.save();
+		const notification = new Notification({ type: "follow", from: req.user._id, to: userToModify._id });
+		await notification.save();
+
+		const populated = await notification.populate("from", "username profileImg");
+		emitToUser(userToModify._id, "newNotification", populated);
 
 		res.status(200).json({ message: "User followed successfully" });
 	}
