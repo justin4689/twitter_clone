@@ -22,36 +22,23 @@ const SignUpPage = () => {
 
 	const { mutate, isError, isPending, error } = useMutation({
 		mutationFn: async ({ email, username, fullName, password }) => {
-			try {
-				const res = await fetch("/api/auth/signup", {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({ email, username, fullName, password }),
-				});
-
-				const data = await res.json();
-				if (!res.ok) throw new Error(data.error || "Failed to create account");
-				console.log(data);
-				return data;
-			} catch (error) {
-				console.error(error);
-				throw error;
-			}
+			const res = await fetch("/api/auth/signup", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ email, username, fullName, password }),
+			});
+			const data = await res.json();
+			if (!res.ok) throw new Error(data.error || "Failed to create account");
+			return data;
 		},
 		onSuccess: () => {
 			toast.success("Account created successfully");
-
-			{
-				/* Added this line below, after recording the video. I forgot to add this while recording, sorry, thx. */
-			}
 			queryClient.invalidateQueries({ queryKey: ["authUser"] });
 		},
 	});
 
 	const handleSubmit = (e) => {
-		e.preventDefault(); // page won't reload
+		e.preventDefault();
 		mutate(formData);
 	};
 
@@ -61,11 +48,11 @@ const SignUpPage = () => {
 
 	return (
 		<div className='max-w-screen-xl mx-auto flex h-screen px-10'>
-			<div className='flex-1 hidden lg:flex items-center  justify-center'>
+			<div className='flex-1 hidden lg:flex items-center justify-center'>
 				<XSvg className='lg:w-2/3 fill-white' />
 			</div>
 			<div className='flex-1 flex flex-col justify-center items-center'>
-				<form className='lg:w-2/3  mx-auto md:mx-20 flex gap-4 flex-col' onSubmit={handleSubmit}>
+				<form className='lg:w-2/3 mx-auto md:mx-20 flex gap-4 flex-col' onSubmit={handleSubmit}>
 					<XSvg className='w-24 lg:hidden fill-white' />
 					<h1 className='text-4xl font-extrabold text-white'>Join today.</h1>
 					<label className='input input-bordered rounded flex items-center gap-2'>
@@ -84,7 +71,7 @@ const SignUpPage = () => {
 							<FaUser />
 							<input
 								type='text'
-								className='grow '
+								className='grow'
 								placeholder='Username'
 								name='username'
 								onChange={handleInputChange}

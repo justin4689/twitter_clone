@@ -15,21 +15,13 @@ import LoadingSpinner from "./components/common/LoadingSpinner";
 
 function App() {
 	const { data: authUser, isLoading } = useQuery({
-		// we use queryKey to give a unique name to our query and refer to it later
 		queryKey: ["authUser"],
 		queryFn: async () => {
-			try {
-				const res = await fetch("/api/auth/me");
-				const data = await res.json();
-				if (data.error) return null;
-				if (!res.ok) {
-					throw new Error(data.error || "Something went wrong");
-				}
-				console.log("authUser is here:", data);
-				return data;
-			} catch (error) {
-				throw new Error(error);
-			}
+			const res = await fetch("/api/auth/me");
+			const data = await res.json();
+			if (data.error) return null;
+			if (!res.ok) throw new Error(data.error || "Something went wrong");
+			return data;
 		},
 		retry: false,
 	});
@@ -44,7 +36,6 @@ function App() {
 
 	return (
 		<div className='flex max-w-6xl mx-auto'>
-			{/* Common component, bc it's not wrapped with Routes */}
 			{authUser && <Sidebar />}
 			<Routes>
 				<Route path='/' element={authUser ? <HomePage /> : <Navigate to='/login' />} />

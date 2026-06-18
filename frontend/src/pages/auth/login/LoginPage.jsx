@@ -22,26 +22,15 @@ const LoginPage = () => {
 		error,
 	} = useMutation({
 		mutationFn: async ({ username, password }) => {
-			try {
-				const res = await fetch("/api/auth/login", {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({ username, password }),
-				});
-
-				const data = await res.json();
-
-				if (!res.ok) {
-					throw new Error(data.error || "Something went wrong");
-				}
-			} catch (error) {
-				throw new Error(error);
-			}
+			const res = await fetch("/api/auth/login", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ username, password }),
+			});
+			const data = await res.json();
+			if (!res.ok) throw new Error(data.error || "Something went wrong");
 		},
 		onSuccess: () => {
-			// refetch the authUser
 			queryClient.invalidateQueries({ queryKey: ["authUser"] });
 		},
 	});
@@ -57,7 +46,7 @@ const LoginPage = () => {
 
 	return (
 		<div className='max-w-screen-xl mx-auto flex h-screen'>
-			<div className='flex-1 hidden lg:flex items-center  justify-center'>
+			<div className='flex-1 hidden lg:flex items-center justify-center'>
 				<XSvg className='lg:w-2/3 fill-white' />
 			</div>
 			<div className='flex-1 flex flex-col justify-center items-center'>
@@ -75,7 +64,6 @@ const LoginPage = () => {
 							value={formData.username}
 						/>
 					</label>
-
 					<label className='input input-bordered rounded flex items-center gap-2'>
 						<MdPassword />
 						<input

@@ -20,24 +20,15 @@ const CreatePost = () => {
 		error,
 	} = useMutation({
 		mutationFn: async ({ text, img }) => {
-			try {
-				const res = await fetch("/api/posts/create", {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({ text, img }),
-				});
-				const data = await res.json();
-				if (!res.ok) {
-					throw new Error(data.error || "Something went wrong");
-				}
-				return data;
-			} catch (error) {
-				throw new Error(error);
-			}
+			const res = await fetch("/api/posts/create", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ text, img }),
+			});
+			const data = await res.json();
+			if (!res.ok) throw new Error(data.error || "Something went wrong");
+			return data;
 		},
-
 		onSuccess: () => {
 			setText("");
 			setImg(null);
@@ -55,9 +46,7 @@ const CreatePost = () => {
 		const file = e.target.files[0];
 		if (file) {
 			const reader = new FileReader();
-			reader.onload = () => {
-				setImg(reader.result);
-			};
+			reader.onload = () => setImg(reader.result);
 			reader.readAsDataURL(file);
 		}
 	};
@@ -66,12 +55,12 @@ const CreatePost = () => {
 		<div className='flex p-4 items-start gap-4 border-b border-gray-700'>
 			<div className='avatar'>
 				<div className='w-8 rounded-full'>
-					<img src={authUser.profileImg || "/avatar-placeholder.png"} />
+					<img src={authUser.profileImg || "/avatar-placeholder.png"} alt={authUser.fullName} />
 				</div>
 			</div>
 			<form className='flex flex-col gap-2 w-full' onSubmit={handleSubmit}>
 				<textarea
-					className='textarea w-full p-0 text-lg resize-none border-none focus:outline-none  border-gray-800'
+					className='textarea w-full p-0 text-lg resize-none border-none focus:outline-none border-gray-800'
 					placeholder='What is happening?!'
 					value={text}
 					onChange={(e) => setText(e.target.value)}
@@ -85,10 +74,9 @@ const CreatePost = () => {
 								imgRef.current.value = null;
 							}}
 						/>
-						<img src={img} className='w-full mx-auto h-72 object-contain rounded' />
+						<img src={img} className='w-full mx-auto h-72 object-contain rounded' alt='Preview' />
 					</div>
 				)}
-
 				<div className='flex justify-between border-t py-2 border-t-gray-700'>
 					<div className='flex gap-1 items-center'>
 						<CiImageOn

@@ -12,18 +12,9 @@ const Sidebar = () => {
 	const queryClient = useQueryClient();
 	const { mutate: logout } = useMutation({
 		mutationFn: async () => {
-			try {
-				const res = await fetch("/api/auth/logout", {
-					method: "POST",
-				});
-				const data = await res.json();
-
-				if (!res.ok) {
-					throw new Error(data.error || "Something went wrong");
-				}
-			} catch (error) {
-				throw new Error(error);
-			}
+			const res = await fetch("/api/auth/logout", { method: "POST" });
+			const data = await res.json();
+			if (!res.ok) throw new Error(data.error || "Something went wrong");
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["authUser"] });
@@ -59,7 +50,6 @@ const Sidebar = () => {
 							<span className='text-lg hidden md:block'>Notifications</span>
 						</Link>
 					</li>
-
 					<li className='flex justify-center md:justify-start'>
 						<Link
 							to={`/profile/${authUser?.username}`}
@@ -77,7 +67,7 @@ const Sidebar = () => {
 					>
 						<div className='avatar hidden md:inline-flex'>
 							<div className='w-8 rounded-full'>
-								<img src={authUser?.profileImg || "/avatar-placeholder.png"} />
+								<img src={authUser?.profileImg || "/avatar-placeholder.png"} alt={authUser?.fullName} />
 							</div>
 						</div>
 						<div className='flex justify-between flex-1'>
